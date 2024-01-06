@@ -111,7 +111,7 @@ names(house_offers_new)
 #database dimension
 dim(house_offers_new)
 
-# 3. Graphical and numerical analysis of the analysed variables
+# 3. Graphical and numerical analysis of the variables
 
 # 3.1. Descriptive numerical analysis of numeric and non-numeric variables
 
@@ -219,3 +219,76 @@ boxplot(house_offers_new$rooms_count, horizontal = TRUE)
 boxplot(house_offers_new$built_surface, horizontal = TRUE)
 boxplot(house_offers_new$useful_surface, horizontal = TRUE)
 boxplot(house_offers_new$bathrooms_count, horizontal = TRUE)
+
+# 4. Statistical analysis of categorical variables
+
+# 4.1. Data tabulation (obtaining marginal, conditional, partial frequencies)
+#contingency table -> using table function
+contingency_table <- table(house_offers_new$partitioning, house_offers_new$price_range)
+contingency_table
+
+#absolute marginal frequency
+addmargins(contingency_table)
+
+#relative marginal frequency
+addmargins(prop.table(contingency_table))
+
+#partial frequency
+prop.table(contingency_table)
+
+#conditional frequencies
+#for partitioning variable
+prop.table(contingency_table,1)
+
+#for prince_range variable
+prop.table(contingency_table,2)
+
+#now we will calculate all types of frequencies for factory variables one by one
+
+#for partitioning
+table(house_offers_new$partitioning)
+
+#relative frequency
+table(house_offers_new$partitioning)/length(house_offers_new$partitioning)
+
+#absolute marginal frequency
+addmargins(table(house_offers_new$partitioning))
+
+#relative marginal frequency
+addmargins(table(house_offers_new$partitioning))/length(house_offers_new$partitioning)
+
+#for price_range
+table(house_offers_new$price_range)
+
+#relative frequency
+table(house_offers_new$price_range)/length(house_offers_new$price_range)
+
+#absolute marginal frequency
+addmargins(table(house_offers_new$price_range))
+
+#relative marginal frequency
+addmargins(table(house_offers_new$price_range))/length(house_offers_new$price_range)
+
+# 4.2. Association analysis
+
+association_analysis <- table(house_offers_new$partitioning, house_offers_new$price_range)
+summary(association_analysis)
+chisq.test(association_analysis)
+
+# 4.3. concordance analysis
+chisq.test(table(house_offers_new$partitioning))
+chisq.test(table(house_offers_new$price_range))
+
+
+# 5. Regression and correlation analysis
+# 5.1 Correlation analysis
+# 5.2 Regression analysis
+# 5.2.1 Simple and multiple linear regression
+# 5.2.2. Nonlinear regression
+# 5.2.3. Comparison of two regression models and choice of the best model
+# 6. Estimation and testing of means
+# 6.1. Estimation of the mean by confidence interval
+# 6.2 Testing population means
+# 6.2.1. Testing a mean with a fixed value
+# 6.2.2 Testing the difference between two means (either with independent samples or with paired samples)
+# 6.2.3 Testing the difference between three or more means
