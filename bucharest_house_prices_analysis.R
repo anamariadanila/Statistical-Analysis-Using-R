@@ -281,14 +281,61 @@ chisq.test(table(house_offers_new$price_range))
 
 
 # 5. Regression and correlation analysis
+
 # 5.1 Correlation analysis
+sapply(house_offers_new, class)
+cor(house_offers_new[c(2,3,4,5,6)], use = 'pairwise')
+cor.test(house_offers_new$price, house_offers_new$rooms_count)
+cor.test(house_offers_new$price, house_offers_new$useful_surface)
+cor.test(house_offers_new$price, house_offers_new$built_surface)
+cor.test(house_offers_new$price, house_offers_new$bathrooms_count)
+
 # 5.2 Regression analysis
+
 # 5.2.1 Simple and multiple linear regression
+
+#simple regression
+simple_regression <- lm(price~built_surface, house_offers_new)
+simple_regression
+
+#coefficients test
+coef(summary(simple_regression))
+
+#multiple regression
+multiple_regression <- lm(price~built_surface + rooms_count, house_offers_new)
+multiple_regression
+
+#coefficients test
+coef(summary(multiple_regression))
+
 # 5.2.2. Nonlinear regression
+nonlinear_regression <- lm(price~built_surface + I(built_surface ^ 2), house_offers_new)
+nonlinear_regression
+
+#coefficients test
+coef(summary(nonlinear_regression))
+
 # 5.2.3. Comparison of two regression models and choice of the best model
+anova(simple_regression, multiple_regression)
+
+
 # 6. Estimation and testing of means
+
 # 6.1. Estimation of the mean by confidence interval
+#using t test
+t.test(house_offers_new$price)
+
 # 6.2 Testing population means
+
 # 6.2.1. Testing a mean with a fixed value
+pop_mean = mean(house_offers_new$price[which(house_offers_new$price > 130000)])
+pop_mean
+t.test(house_offers_new$price, mu = pop_mean)
+
 # 6.2.2 Testing the difference between two means (either with independent samples or with paired samples)
+bartlett.test(price~partitioning, house_offers_new, partitioning %in% c('decomandat', 'semidecomandat'))
+t.test(price~partitioning, house_offers_new, partitioning %in% c('decomandat', 'semidecomandat'), var.eqaul = F)
+
 # 6.2.3 Testing the difference between three or more means
+means_difference <- aov(price~partitioning, house_offers_new)
+anova(means_difference)
