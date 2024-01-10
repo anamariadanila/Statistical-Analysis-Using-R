@@ -90,6 +90,10 @@ sum(is.na(house_offers_new))
 
 nrow(house_offers_new) #7253
 
+#remove rows with blank values for partitioning variable
+house_offers_new <- house_offers_new[-which(house_offers_new$partitioning == ''),]
+nrow(house_offers_new) #7138
+
 #export the new database created
 write.csv(house_offers_new, "house_offers_new.csv")
 
@@ -213,12 +217,11 @@ ggplot(house_offers_new, aes(price_range)) + geom_bar(fill = 'orange') + labs(x=
 # 3.3. Identification of outliers and their elimination from the base (or their replacement with missing values) 
 #for this step we will use the boxplot function
 
-boxplot(house_offers_new$price, horizontal = TRUE)
-boxplot(house_offers_new$price, horizontal = TRUE, range = 12)
-boxplot(house_offers_new$rooms_count, horizontal = TRUE)
-boxplot(house_offers_new$built_surface, horizontal = TRUE)
-boxplot(house_offers_new$useful_surface, horizontal = TRUE)
-boxplot(house_offers_new$bathrooms_count, horizontal = TRUE)
+boxplot(house_offers_new$price, horizontal = TRUE, xlab = 'value')
+boxplot(house_offers_new$rooms_count, horizontal = TRUE, xlab = 'value')
+boxplot(house_offers_new$built_surface, horizontal = TRUE, xlab = 'value')
+boxplot(house_offers_new$useful_surface, horizontal = TRUE, xlab = 'value')
+boxplot(house_offers_new$bathrooms_count, horizontal = TRUE, xlab = 'value')
 
 # 4. Statistical analysis of categorical variables
 
@@ -227,14 +230,14 @@ boxplot(house_offers_new$bathrooms_count, horizontal = TRUE)
 contingency_table <- table(house_offers_new$partitioning, house_offers_new$price_range)
 contingency_table
 
+#partial frequency
+prop.table(contingency_table)
+
 #absolute marginal frequency
 addmargins(contingency_table)
 
 #relative marginal frequency
 addmargins(prop.table(contingency_table))
-
-#partial frequency
-prop.table(contingency_table)
 
 #conditional frequencies
 #for partitioning variable
@@ -243,37 +246,14 @@ prop.table(contingency_table,1)
 #for prince_range variable
 prop.table(contingency_table,2)
 
-#now we will calculate all types of frequencies for factory variables one by one
-
-#for partitioning
-table(house_offers_new$partitioning)
-
-#relative frequency
-table(house_offers_new$partitioning)/length(house_offers_new$partitioning)
-
-#absolute marginal frequency
-addmargins(table(house_offers_new$partitioning))
-
-#relative marginal frequency
-addmargins(table(house_offers_new$partitioning))/length(house_offers_new$partitioning)
-
-#for price_range
-table(house_offers_new$price_range)
-
-#relative frequency
-table(house_offers_new$price_range)/length(house_offers_new$price_range)
-
-#absolute marginal frequency
-addmargins(table(house_offers_new$price_range))
-
-#relative marginal frequency
-addmargins(table(house_offers_new$price_range))/length(house_offers_new$price_range)
-
 # 4.2. Association analysis
 
 association_analysis <- table(house_offers_new$partitioning, house_offers_new$price_range)
-summary(association_analysis)
+#we had to remove the first row because the contingency table has the first row full of 0 values, due to the fact that partitioning variable
+#used to have empty string values
+association_analysis <- association_analysis[-1, ,drop=FALSE]
 chisq.test(association_analysis)
+
 
 # 4.3. concordance analysis
 chisq.test(table(house_offers_new$partitioning))
@@ -283,7 +263,6 @@ chisq.test(table(house_offers_new$price_range))
 # 5. Regression and correlation analysis
 
 # 5.1 Correlation analysis
-sapply(house_offers_new, class)
 cor(house_offers_new[c(2,3,4,5,6)], use = 'pairwise')
 cor.test(house_offers_new$price, house_offers_new$rooms_count)
 cor.test(house_offers_new$price, house_offers_new$useful_surface)
@@ -302,7 +281,7 @@ simple_regression
 coef(summary(simple_regression))
 
 #multiple regression
-multiple_regression <- lm(price~built_surface + rooms_count, house_offers_new)
+multiple_regression <- lm(price~built_surface + rooms_count + useful_surface, house_offers_new)
 multiple_regression
 
 #coefficients test
@@ -328,7 +307,7 @@ t.test(house_offers_new$price)
 # 6.2 Testing population means
 
 # 6.2.1. Testing a mean with a fixed value
-pop_mean = mean(house_offers_new$price[which(house_offers_new$price > 130000)])
+pop_mean = mean(house_offers_new$price[which(house_offers_new$price > 70000)])
 pop_mean
 t.test(house_offers_new$price, mu = pop_mean)
 
